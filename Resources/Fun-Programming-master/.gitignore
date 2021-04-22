@@ -1,0 +1,16 @@
+arduino/libraries/
+processing/ideas/2013/11/stm/data/
+processing/libraries/
+processing/libraries_off/
+processing/modes/
+processing/tools/
+processing/examples/
+processing/Kollidoscope/
+processing/otherPeople/FiftyShadesOfShaders*
+openframeworks/horinbow/obj/*
+sketch.properties
+actionscript/
+c++/
+clojure/
+godot/
+
