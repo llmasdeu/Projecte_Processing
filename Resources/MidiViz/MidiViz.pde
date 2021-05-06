@@ -10,10 +10,10 @@ void setup() {
   colorMode(HSB);
   noStroke();
   midiPlayer = new AMidiPlayer();
-  midiPlayer.load(dataPath("prova.mid"));
+  midiPlayer.load(dataPath("Bass.mid"));
   midiPlayer.start();
   shader = loadShader("shader.glsl");
-  println("size: " + midiPlayer.getNotes().size());
+  //println("size: " + midiPlayer.getNotes().size());
   for (Note n : midiPlayer.getNotes()) {
     println(n.note);
   }

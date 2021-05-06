@@ -66,7 +66,7 @@ class AMidiPlayer implements Receiver {
         if (cmd == ShortMessage.NOTE_ON && velocity > 0) {
           
           midiData.put(id, new Note(channel, note, velocity));
-          println("send: " + id); //<>//
+          println("note: " + note); //<>//
         } else {
           midiData.get(id).dying++;
         }
