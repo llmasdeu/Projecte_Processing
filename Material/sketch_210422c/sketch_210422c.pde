@@ -17,6 +17,8 @@ import processing.sound.*;
 import java.util.Collection;
 import javax.sound.midi.*;
 
+  Sequencer sequencer;
+
 TriOsc triOsc;
 Env env; 
 
@@ -26,17 +28,53 @@ float sustainTime = 0.004;
 float sustainLevel = 0.3;
 float releaseTime = 0.2;
 
+AMidiPlayer player = new AMidiPlayer();
+
 // This is an octave in MIDI notes.
-int[] midiSequence = { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 }; 
+//int[] midiSequence = { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 }; 
+int[] midiSequence;
 
 // Play a new note every 200ms
-int duration = 200;
+int duration = 450;
 
 // This variable stores the point in time when the next note should be triggered
 int trigger = millis(); 
 
 // An index to count up the notes
 int note = 0; 
+
+long timeStamp = 0;
+
+
+
+void playMusic()
+{
+  File test = new File(dataPath("Bass.mid"));
+  Sequence mySeq = null;
+  try 
+  {
+    mySeq = MidiSystem.getSequence(test);
+    
+  } catch (Exception e) {
+   // Handle error and/or return
+   println(e.getMessage());
+  }
+  
+    Track[] tracks = mySeq.getTracks();
+    Track track = tracks[1];
+    println(tracks.length);
+    
+    for(int i = 0; i < track.size(); i++)
+    {
+      MidiEvent midiEvent = track.get(i);
+      MidiMessage midiMessage = midiEvent.getMessage();
+      player.send(midiMessage,timeStamp);
+    }
+    
+      midiSequence = player.getMidiSequence();
+
+}
+
 
 void setup() {
   size(640, 360);
@@ -47,10 +85,14 @@ void setup() {
 
   // Create the envelope 
   env = new Env(this);
+  
+  playMusic();
 }
+
 
 void draw() { 
 
+  
   // If the determined trigger moment in time matches up with the computer clock and
   // the sequence of notes hasn't been finished yet, the next note gets played.
   if ((millis() > trigger) && (note<midiSequence.length)) {
