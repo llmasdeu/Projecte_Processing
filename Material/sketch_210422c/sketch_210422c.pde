@@ -72,9 +72,7 @@ void playMusic()
     }
     
       midiSequence = player.getMidiSequence();
-
 }
-
 
 void setup() {
   size(640, 360);
@@ -89,10 +87,7 @@ void setup() {
   playMusic();
 }
 
-
 void draw() { 
-
-  
   // If the determined trigger moment in time matches up with the computer clock and
   // the sequence of notes hasn't been finished yet, the next note gets played.
   if ((millis() > trigger) && (note<midiSequence.length)) {
