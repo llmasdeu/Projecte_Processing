@@ -17,25 +17,25 @@ import processing.sound.*;
 import java.util.Collection;
 import javax.sound.midi.*;
 
-  Sequencer sequencer;
+Sequencer sequencer;
 
 TriOsc triOsc;
 Env env; 
 
 // Times and levels for the ASR envelope
-float attackTime = 0.001;
+float attackTime = 0.0001;
 float sustainTime = 0.004;
 float sustainLevel = 0.3;
-float releaseTime = 0.2;
+float releaseTime = 0.1;
 
 AMidiPlayer player = new AMidiPlayer();
 
 // This is an octave in MIDI notes.
 //int[] midiSequence = { 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72 }; 
-int[] midiSequence;
+int[] midiSequence;  
 
 // Play a new note every 200ms
-int duration = 450;
+int duration = 250;
 
 // This variable stores the point in time when the next note should be triggered
 int trigger = millis(); 
@@ -44,8 +44,6 @@ int trigger = millis();
 int note = 0; 
 
 long timeStamp = 0;
-
-
 
 void playMusic()
 {
