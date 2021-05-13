@@ -1,27 +1,29 @@
-import java.util.concurrent.ConcurrentHashMap;
-
-class AMidiPlayer implements Receiver
-{
-  //private int[] midiSequence;
-  ArrayList<Integer> midiSequence = new ArrayList<Integer>();
-
-  int i = 0;
+public class AMidiPlayer implements Receiver {
+  private ArrayList<Integer> midiSequence;
+  private ArrayList<Note> notesSequence;
   
-  public int[] getMidiSequence()
-  {
+  public AMidiPlayer() {
+    this.midiSequence = new ArrayList<Integer>();
+    this.notesSequence = new ArrayList<Note>();
+  }
+  
+  public int[] getMidiSequence() {
     int [] returnType = new int[midiSequence.size()];
-    for (int i = 0; i < midiSequence.size(); i++)
-    {
+    
+    for (int i = 0; i < midiSequence.size(); i++) {
       returnType[i] = midiSequence.get(i);
     }
+    
     return returnType;
   }
   
   // When I say "send" I mean "receive" :)
-  @Override public void send(MidiMessage message, long t) {
+  @Override
+  public void send(MidiMessage message, long t) {
     if (message instanceof ShortMessage) {
       ShortMessage sm = (ShortMessage) message;
-      int cmd = sm.getCommand(); 
+      int cmd = sm.getCommand();
+      
       if (cmd == ShortMessage.NOTE_ON || cmd == ShortMessage.NOTE_OFF) {
         int channel = sm.getChannel() - 1;      
         int note = sm.getData1();
@@ -30,8 +32,9 @@ class AMidiPlayer implements Receiver
         if (cmd == ShortMessage.NOTE_ON && velocity > 0) {
           
           //midiData.put(id, new Note(channel, note, velocity));
-          midiSequence.add(note);
-          println("note: " + note);
+          this.midiSequence.add(note);
+          this.notesSequence.add(new Note(note));
+          //println("note: " + note);
         } else {
           //midiData.get(id).dying++;
         }
@@ -39,8 +42,10 @@ class AMidiPlayer implements Receiver
     }
   }
   
-    @Override public void close() 
-    {
-    }
-
+  @Override
+  public void close() {}
+  
+  public ArrayList<Note> getNotesSequence() {
+    return this.notesSequence;
+  }
 }
