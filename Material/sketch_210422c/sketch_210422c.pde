@@ -108,7 +108,7 @@ void draw() {
 
     // Loop the sequence, notice the jitter
     if (note == 12) {
-      note = 0;
+      //note = 0;
     }
   }
 } 
