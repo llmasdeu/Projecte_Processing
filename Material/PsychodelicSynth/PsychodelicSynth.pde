@@ -43,15 +43,21 @@ void draw() {
 }
 
 void changeColor(){
-  background(s);
+  /*background(s);
   //el tono asume el valor de n
   h = n;
   //la saturación, un valor aleatorio entre 50 y 100
   s = random(0, 255);
   //y el brillo, valores variables pero cercanos entre 0 y 100
-  b = noise(n/50)*100;
+  b = noise(n/50)*100;*/
   //n aumenta en 1 en cada ciclo 
   n++;
+  
+  color col1 = color (random(255), 
+    random(255), 
+    random(255) ); 
+ 
+  background(col1);
  
   //si n alcanza el valor máximo
   if(n == 100){
