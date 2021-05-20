@@ -1,10 +1,15 @@
+/**
+ *  Class in charge of the management of the synth.
+ */
 public class Synth {
   private PApplet parent;
   private String filePath;
   private AMidiPlayer player;
+  private LowPass lowPass;
+  private Reverb reverb;
   private Sequencer sequencer;
   private TriOsc triOsc;
-  private Env env; 
+  private Env env;
   private Track[] tracks;
   private int[] midiSequence;
   private ArrayList<Note> notesSequence;
@@ -16,9 +21,18 @@ public class Synth {
   private float sustainTime;
   private float sustainLevel;
   private float releaseTime;
+  private Note previousNote;
   private Note currentNote;
   private boolean fileStatus;
-    
+  private float s;
+  private float h;
+  private float b;
+  private float n;
+  private color backgroundColor;
+
+  /**
+   *  Constructor of the class.
+   */
   public Synth(PApplet parent, String filePath) {
     this.parent = parent;
     this.filePath = filePath;
@@ -31,6 +45,12 @@ public class Synth {
     
     // Create the envelope
     this.env = new Env(parent);
+    
+    // Sets the low pass filter
+    this.lowPass = new LowPass(parent);
+    
+    // Sets the reverb object
+    this.reverb = new Reverb(parent);
     
     // An index to count up the notes
     this.note = 0;
@@ -49,11 +69,20 @@ public class Synth {
     this.sustainLevel = 0.3;
     this.releaseTime = 1.0;
     
+    this.previousNote = null;
     this.currentNote = null;
     
     this.tracks = null;
     this.midiSequence = null;
     this.notesSequence = null;
+    
+    this.s = 0.0;
+    this.h = 0.0;
+    this.b = 0.0;
+    this.n = 0.0;
+    
+    // Sets the current background color
+    changeBackgroundColor();
     
     // Reads the file
     this.fileStatus = readFile();
@@ -107,76 +136,104 @@ public class Synth {
         this.attackTime = map(mouseX, 0, width, 0.001, 1.0);
         this.releaseTime = map(mouseY, height, 0, 0.1, 1.0);
 
-    
         // The envelope gets triggered with the oscillator as input and the times and
         // levels we defined earlier
         this.env.play(this.triOsc, this.attackTime, this.sustainTime, this.sustainLevel, this.releaseTime);
-    
+        
+        // Sets the frequency
+        this.lowPass.process(this.triOsc, map(mouseX, 0, width, 0, 20000));
+        
+        // Sets the reverberation
+        this.reverb.process(this.triOsc);
+        
+        // Change the roomsize of the reverb
+        float roomSize = map(mouseX, 0, width, 0, 1.0);
+        reverb.room(roomSize);
+      
+        // Change the high frequency dampening parameter
+        float damping = map(mouseX, 0, width, 0, 1.0);
+        reverb.damp(damping);
+      
+        // Change the wet/dry relation of the effect
+        float effectStrength = map(mouseY, 0, height, 0, 1.0);
+        reverb.wet(effectStrength);
+
         // Create the new trigger according to predefined duration
         this.trigger = millis() + this.duration;
         
+        // Gets the current and the previous notes
+        this.previousNote = this.currentNote;
         this.currentNote = this.notesSequence.get(this.note);
     
         // Advance by one note in the midiSequence;
         this.note++;
     
         // Loop the sequence, notice the jitter
-        if (this.note == this.midiSequence.length) {
-           this.note = 0;
-        }
+        if (this.note == this.midiSequence.length)
+          this.note = 0;
       }
     }
   }
   
-  
-void changeColor(){
-   fill(h, s, b);
-  //el tono asume el valor de n
-  h = n;
-  //la saturación, un valor aleatorio entre 50 y 100
-  s = random(50, 100);
-  //y el brillo, valores variables pero cercanos entre 0 y 100
-  b = noise(n/50)*100;
-  //n aumenta en 1 en cada ciclo 
-  n++;
- 
-  //si n alcanza el valor máximo
-  if(n == 100){
-    //vuelve a cero
-    n = 0;
-  } 
-}
+  void changeColor() {
+    // Sets the parameters of the filling
+    fill(this.h, this.s, this.b);
+    
+    // Hue assumes the value of n
+    this.h = this.n;
+    //la saturación, un valor aleatorio entre 50 y 100
+    this.s = random(50, 100);
+    //y el brillo, valores variables pero cercanos entre 0 y 100
+    this.b = noise(n / 50) * 100;
+    
+    // n increments in each cycle
+    this.n++;
+   
+    //si n alcanza el valor máximo
+    if (this.n == 100)
+      this.n = 0;
+  }
 
-  
   public void drawNote() {
-  int inverseX = width-mouseX;
-  int inverseY = height-mouseY;
+    int inverseX = width - mouseX;
+    int inverseY = height - mouseY;
+    
+    // Check if the background color should change
+    if (this.currentNote != null && this.previousNote != null)
+      if (this.currentNote.getNoteName() != this.previousNote.getNoteName())
+        changeBackgroundColor();
+    
+    // Sets the background color
+    setBackgroundColor();
+    
     if (currentNote != null) {
       switch (currentNote.getNoteName()) {
         case "C":
           changeColor();
           ellipse(mouseX, mouseY, 60, 60);
           ellipse(inverseX, inverseY, 60, 60);
+          ellipse(mouseX, inverseY, 60, 60);
+          ellipse(inverseX, mouseY, 60, 60);
           break;
           
         case "C#":
           changeColor();
-          ellipse(mouseX, mouseY, 30, 30);
-          ellipse(inverseX, inverseY, 30, 30);
-          ellipse(mouseY, mouseX, 30, 30);
-          ellipse(inverseY, inverseX, 30, 30);          
+          ellipse(mouseX, mouseY, 45, 45);
+          ellipse(inverseX, inverseY, 45, 45);
+          ellipse(mouseX, inverseY, 45, 45);
+          ellipse(inverseX, mouseY, 45, 45);          
           break;
           
         case "D":
           changeColor();
           triangle(mouseX, mouseY - 30, mouseX - 30, mouseY + 30, mouseX + 30, mouseY + 30);
-          triangle(inverseX, inverseY - 30, inverseX - 30, inverseY + 30, inverseX + 30, inverseY + 30);        
+          triangle(inverseX, inverseY - 30, inverseX - 30, inverseY + 30, inverseX + 30, inverseY + 30);
           break;
           
         case "D#":
           changeColor();
-          triangle(mouseX, mouseY - 15, mouseX - 15, mouseY + 15, mouseX + 15, mouseY + 15);
-          triangle(inverseX, inverseY - 15, inverseX - 15, inverseY + 15, inverseX + 15, inverseY + 15);
+          triangle(mouseX, mouseY - 22, mouseX - 22, mouseY + 22, mouseX + 22, mouseY + 22);
+          triangle(inverseX, inverseY - 22, inverseX - 22, inverseY + 22, inverseX + 22, inverseY + 22);
           break;
           
         case "E":
@@ -188,35 +245,41 @@ void changeColor(){
         case "F":
           changeColor();
           rect(mouseX - 30, mouseY - 30, 60, 60);
-          rect(inverseX - 30, inverseY - 30, 60, 60);          
+          rect(inverseX - 30, inverseY - 30, 60, 60);
           break;
           
         case "F#":
-          rect(mouseX - 15, mouseY - 15, 30, 30);
-          rect(inverseX - 15, inverseY - 15, 30, 30);
+          changeColor();
+          rect(mouseX - 22, mouseY - 22, 44, 44);
+          rect(inverseX - 22, inverseY - 22, 44, 44);
           break;
     
         case "G":
+          changeColor();
           quad(mouseX - 35, mouseY - 54, mouseX + 24, mouseY + 32, mouseX - 37, mouseY + 37, mouseX + 45, mouseY + 43);
           quad(inverseX - 35, inverseY - 54, inverseX + 24, inverseY + 32, inverseX - 37, inverseY + 37, inverseX + 45, inverseY + 43);
           break;
           
         case "G#":
+          changeColor();
           quad(mouseX - 15, mouseY - 21, mouseX + 24, mouseY + 32, mouseX - 7, mouseY + 15, mouseX + 45, mouseY + 23);
           quad(inverseX - 15, inverseY - 21, inverseX + 24, inverseY + 32, inverseX - 7, inverseY + 15, inverseX + 45, inverseY + 23);
           break;
     
         case "A":
+          changeColor();
           rect(mouseX - 60, mouseY - 60, 120, 120, 7);
           rect(inverseX - 60, inverseY - 60, 120, 120, 7);
           break;
           
         case "A#":
+          changeColor();
           rect(mouseX - 45, mouseY - 45, 90, 90, 7);
           rect(inverseX - 45, inverseY - 45, 90, 90, 7);
           break;
           
         case "B":
+          changeColor();
           arc(mouseX, mouseY, 80, 80, 0, PI + QUARTER_PI, CHORD);
           arc(inverseX, inverseY, 80, 80, 0, PI + QUARTER_PI, CHORD);
           break;
@@ -224,9 +287,16 @@ void changeColor(){
     }
   }
 
+  void changeBackgroundColor() {    
+    this.backgroundColor = color(random(0, 255), random(0, 255), random(0, 255)); 
+  }
+  
+  void setBackgroundColor() {
+    background(this.backgroundColor);
+  }
   
   // This helper function calculates the respective frequency of a MIDI note
   private float midiToFreq(int note) {
-    return (pow(2, ((note-69) / 12.0))) * 440;
+    return (pow(2, ((note - 69) / 12.0))) * 440;
   }
 }

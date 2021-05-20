@@ -22,6 +22,7 @@
 ### Documentation & Tutorials
 
 * [Sound \ Processing.org](https://processing.org/tutorials/sound/)
+* [LowPass \ Language (API) \ Processing 3+](https://processing.org/reference/libraries/sound/LowPass.html)
 * [Usando un controlador MIDI | Aprendiendo Processing](http://dunadigital.com/processing/2015/04/06/usando-un-controlador-midi/)
 * [Standard MIDI file format, updated](http://www.music.mcgill.ca/~ich/classes/mumt306/StandardMIDIfileformat.html)
 * [New library: Control and tweak your sketches using MIDI controller Novation Launch Control - Processing 2.x and 3.x Forum](https://forum.processing.org/two/discussion/26537/new-library-control-and-tweak-your-sketches-using-midi-controller-novation-launch-control)
