@@ -43,7 +43,7 @@ void draw() {
 }
 
 void changeColor(){
-   background(s);
+  background(s);
   //el tono asume el valor de n
   h = n;
   //la saturación, un valor aleatorio entre 50 y 100
