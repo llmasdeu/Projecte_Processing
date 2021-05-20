@@ -53,10 +53,7 @@ void changeColor(){
   //n aumenta en 1 en cada ciclo 
   n++;
   
-  color col1 = color (random(255), 
-    random(255), 
-    random(255) ); 
- 
+  color col1 = color (random(255), random(255),random(255) ); 
   background(col1);
  
   //si n alcanza el valor máximo
