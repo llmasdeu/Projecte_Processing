@@ -100,7 +100,9 @@ public class Synth {
     
         // midiToFreq transforms the MIDI value into a frequency in Hz which we use to
         // control the triangle oscillator with an amplitute of 0.5
-        this.triOsc.play(midiToFreq(this.midiSequence[this.note]) + (mouseX + mouseY)/6, 0.5);
+        //this.triOsc.play(midiToFreq(this.midiSequence[this.note]) + (mouseX + mouseY)/6, 0.5);
+        this.triOsc.play(midiToFreq(this.midiSequence[this.note]), 0.5);
+
     
         // The envelope gets triggered with the oscillator as input and the times and
         // levels we defined earlier
@@ -115,8 +117,8 @@ public class Synth {
         this.note++;
     
         // Loop the sequence, notice the jitter
-        if (this.note == 12) {
-          // this.note = 0;
+        if (this.note == this.midiSequence.length) {
+           this.note = 0;
         }
       }
     }
