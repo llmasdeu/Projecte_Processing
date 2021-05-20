@@ -102,6 +102,10 @@ public class Synth {
         // control the triangle oscillator with an amplitute of 0.5
         //this.triOsc.play(midiToFreq(this.midiSequence[this.note]) + (mouseX + mouseY)/6, 0.5);
         this.triOsc.play(midiToFreq(this.midiSequence[this.note]), 0.5);
+        
+        this.triOsc.pan(map(mouseX, 0, width, -1.0, 1.0));
+        this.attackTime = map(mouseX, 0, width, 0.001, 1.0);
+        this.releaseTime = map(mouseY, height, 0, 0.1, 1.0);
 
     
         // The envelope gets triggered with the oscillator as input and the times and
